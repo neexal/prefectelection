@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting Page</title>
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="{% static 'main/css/bootstrap.min.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
+
+        .container {
+            width: 90%; /* Utilize 90% of screen width */
+            margin: 0 auto; /* Center the container horizontally */
+            padding: 20px;
+            min-height: 100vh; /* Ensure at least full viewport height */
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            position: relative; /* Make container relative for absolute positioning */
+        }
+
+        /* Left banner */
+        .left-banner,
+        .right-banner {
+            position: absolute;
+            top: 0;
+            width: 20%; /* Adjust width as needed */
+            height: 100%;
+            background-image: url('/static/main/images/placeholder.jpg'); /* Add your left and right banner images */
+            background-size: cover;
+        }
+
+        .left-banner {
+            left: 0;
+        }
+
+        .right-banner {
+            right: 0;
+        }
+
+        .stall-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .stall-button {
+            width: 70px; /* Set fixed width */
+            height: 70px; /* Set fixed height */
+            font-size: 20px; /* Decrease font size */
+            background-color: #fff;
+            color: #000;
+            border: 0.5px solid #007bff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .stall-button:hover {
+            background-color: #588dc7;
+            color: #fff;
+        }
+
+        .selected {
+            background-color: #28a745 !important;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #9c3e38;
+            font-size: 20px;
+            color: #fff;
+        }
+        .btnS{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .btn-submit {
+            padding: 25px 80px; /* Adjust padding for larger size */
+            font-size: 18px; /* Adjust font size for larger size */
+            background-color: #28a745; /* Green color */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #218838; /* Darker green on hover */
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-banner"></div>
+    <div class="right-banner"></div>
+    <div class="container">
+        <h1 class="text-center mb-2">कोशी मेगा प्रदर्शनी-२०८०</h1>
+        <h5 class="mb-2 text-center">कृपया आफ्नो मनपर्ने स्टलहरू चयन गर्नुहोस् (तपाईंले 5 सम्म चयन गर्न सक्नुहुन्छ):</h5>
+
+        <form id="votingForm" method="post">
+            {% csrf_token %}
+            <div class="stall-buttons">
+                {% for stall in stalls %}
+                    <button type="button" class="stall-button" data-stall="{{ stall.stall_number }}">  {{ stall.stall_number }}</button>
+                {% endfor %}
+            </div>
+            <input type="hidden" name="selected_stalls">
+            <div class="btnS">
+                <button type="submit" class="btn btn-submit mt-4">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+
+    <!-- Bootstrap JavaScript -->
+    <script src="{% static 'main/js/jquery.js' %}"></script>
+    <script src="{% static 'main/js/popper.min.js' %}"></script>
+    <script src="{% static 'main/js/bootstrap.min.js' %}"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        $(document).ready(function() {
+            var maxSelections = 5;
+
+            $('.stall-button').on('click', function() {
+                var selectedCount = $('.stall-button.selected').length;
+                if (selectedCount >= maxSelections && !$(this).hasClass('selected')) {
+                    $('#toastMessage').toast('show');
+                } else {
+                    $(this).toggleClass('selected');
+                }
+            });
+
+            $('#votingForm').on('submit', function() {
+                var selectedStalls = [];
+                $('.stall-button.selected').each(function() {
+                    selectedStalls.push($(this).data('stall'));
+                });
+                $(this).find('input[name="selected_stalls"]').val(JSON.stringify(selectedStalls));
+            });
+        });
+    </script>
+
+    <!-- Bootstrap Toast -->
+    <div class="toast" id="toastMessage" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
+        <div class="toast-header">
+            <strong class="mr-auto" style="color:#000;">Attention</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body">
+            तपाईं मात्र 5 स्टलहरू चयन गर्न सक्नुहुन्छ।
+        </div>
+    </div>
+</body>
+</html>

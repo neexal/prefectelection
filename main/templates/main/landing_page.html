@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Koshi Mega Exhibition-2080</title>
+    <link rel="stylesheet" href="{% static 'main/css/bootstrap.css' %}">
+    <style>
+        .container {
+            padding: 30px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color:#970001;
+            margin-top:20px;
+        }
+        
+        .form-label {
+            font-weight: bold;
+        }
+        
+        .custom-keyboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .custom-keyboard button {
+            font-size: 1.5rem;
+            padding: 20px;
+            border: 0.5px solid #b2d6de;
+            background-color: #c0d8e8;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .input_id{
+            height: 70px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .btnS{
+            width: 20%;
+        }
+        img{
+            width:300px;
+            height:300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{% static "main/images/logo.jpg" %}" class="img-fluid rounded mx-auto d-block" alt="" srcset="">
+        <h1 class="text-center">Koshi Perfect Council Election-2082</h1>
+        <form method="post" class="mb-5">
+            <div class="mb-3">
+                {% csrf_token %}
+                <label for="voting_id" class="form-label h3">
+                    कृपया आफ्नो "Voting ID" हाल्नुहोस्।</label>
+                <div style="display: flex;">
+                    <input type="number" class="form-control input_id" id="voting_id" name="voting_id" required>
+                    <button type="submit" class="btn btn-success btnS btn-lg px-4 mx-2">Enter</button>
+                </div>
+            </div>
+        </form>
+        {% if message%}
+            <div><p class="text-danger h4"><b>{{message}}</b></p></div>
+        {%endif%}
+        <div id="customKeyboard" class="custom-keyboard">
+            <button onclick="appendToInput(1)">1</button>
+            <button onclick="appendToInput(2)">2</button>
+            <button onclick="appendToInput(3)">3</button>
+            <button onclick="appendToInput(4)">4</button>
+            <button onclick="appendToInput(5)">5</button>
+            <button onclick="appendToInput(6)">6</button>
+            <button onclick="appendToInput(7)">7</button>
+            <button onclick="appendToInput(8)">8</button>
+            <button onclick="appendToInput(9)">9</button>
+            <button onclick="appendToInput(0)">0</button>
+            <button onclick="clearInput()" class="btn bg-danger">Clear</button>
+            <button onclick="submitForm()" class="btn bg-success ">Submit</button> 
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="{% static 'main/js/jquery.js' %}"></script>
+    <script src="{% static 'main/js/popper.min.js' %}"></script>
+    <script src="{% static 'main/js/bootstrap.min.js' %}"></script>
+ 
+    <script>
+        function appendToInput(value) {
+            document.getElementById('voting_id').value += value;
+        }
+
+        function clearInput() {
+            document.getElementById('voting_id').value = '';
+        }
+
+        function submitForm() {
+            document.querySelector('form').submit(); // Submit the form
+        }
+
+        $(document).ready(function() {
+            // Focus on the input field when the page loads
+            $('#voting_id').focus();
+
+            // Show the on-screen keyboard
+            $('#voting_id').click(function() {
+                $(this).focus();
+            });
+        });
+    </script>
+</body>
+</html>

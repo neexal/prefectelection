@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Voting Page</title>
+    <link rel="stylesheet" href="{% static 'main/css/bootstrap.min.css' %}">
+    <style>
+        body {
+            background-color: #f4f6f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #212529;
+            margin-bottom: 40px;
+        }
+        h3 {
+            color: #495057;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .position-column {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        .candidate {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 16px;
+            background-color: #fdfdfd;
+        }
+        .candidate:hover {
+            background-color: #f1f3f5;
+        }
+        .candidate input[type="radio"] {
+            display: none;
+        }
+        .candidate img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .candidate span {
+            font-size: 16px;
+            font-weight: 500;
+            color: #212529;
+        }
+        .candidate input[type="radio"]:checked + span::before {
+            content: '✓';
+            position: absolute;
+            right: 20px;
+            font-size: 20px;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .candidate input[type="radio"]:checked ~ * {
+            color: #28a745;
+        }
+        .candidate input[type="radio"]:checked ~ span {
+            font-weight: 600;
+        }
+        .submit-btn {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .btn-submit {
+            padding: 12px 36px;
+            font-size: 18px;
+            font-weight: 500;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>School Election Voting</h1>
+        <form method="post" id="votingForm">
+            {% csrf_token %}
+            <input type="hidden" name="selected_candidates" id="selectedCandidatesInput">
+            <div class="row">
+                {% for position in positions %}
+                    <div class="col-md-6 position-column">
+                        <h3>{{ position.name }}</h3>
+                        {% for candidate in position.candidate_set.all %}
+                            <label class="candidate">
+                                <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}">
+                                <img src="{{ candidate.image.url }}" alt="{{ candidate.name }}">
+                                <span>{{ candidate.name }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="submit-btn">
+                <button type="submit" class="btn btn-submit">Submit Vote</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="{% static 'main/js/jquery.js' %}"></script>
+    <script src="{% static 'main/js/popper.min.js' %}"></script>
+    <script src="{% static 'main/js/bootstrap.min.js' %}"></script>
+    <script>
+        $('#votingForm').on('submit', function (e) {
+            const selected = [];
+            $('input[type="radio"]:checked').each(function () {
+                selected.push(parseInt($(this).val()));
+            });
+            $('#selectedCandidatesInput').val(JSON.stringify(selected));
+        });
+    </script>
+</body>
+</html>
