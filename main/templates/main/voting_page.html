@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,16 +13,19 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
         }
+
         h1 {
             text-align: center;
             color: #212529;
             margin-bottom: 40px;
         }
+
         h3 {
             color: #495057;
             margin-bottom: 20px;
             text-align: center;
         }
+
         .position-column {
             background-color: #ffffff;
             padding: 20px;
@@ -29,6 +33,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             margin-bottom: 30px;
         }
+
         .candidate {
             display: flex;
             align-items: center;
@@ -41,27 +46,32 @@
             margin-bottom: 16px;
             background-color: #fdfdfd;
         }
+
         .candidate:hover {
             background-color: #f1f3f5;
         }
+
         .candidate input[type="radio"],
         .candidate input[type="checkbox"] {
             display: none;
         }
+
         .candidate img {
-            width: 48px;
-            height: 48px;
+            width: 60px;
+            height: 60px;
             object-fit: cover;
             border-radius: 50%;
             margin-right: 15px;
         }
+
         .candidate span {
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 22px;
+            font-weight: 400;
             color: #212529;
         }
-        .candidate input[type="radio"]:checked + span::before,
-        .candidate input[type="checkbox"]:checked + span::before {
+
+        .candidate input[type="radio"]:checked+span::before,
+        .candidate input[type="checkbox"]:checked+span::before {
             content: '✓';
             position: absolute;
             right: 20px;
@@ -69,38 +79,47 @@
             color: #28a745;
             font-weight: bold;
         }
-        .candidate input[type="radio"]:checked ~ * {
+
+        .candidate input[type="radio"]:checked~* {
             color: #28a745;
         }
-        .candidate input[type="checkbox"]:checked ~ * {
+
+        .candidate input[type="checkbox"]:checked~* {
             color: #28a745;
         }
-        .candidate input[type="radio"]:checked ~ span,
-        .candidate input[type="checkbox"]:checked ~ span {
+
+        .candidate input[type="radio"]:checked~span,
+        .candidate input[type="checkbox"]:checked~span {
             font-weight: 600;
         }
+
         .candidate input[type="radio"]:checked,
-.candidate input[type="checkbox"]:checked {
-    background-color: #d4edda; /* light green background */
-    border-color: #28a745; /* green border */
-}
-.swastika-icon {
-    margin-left: auto;
-    font-size: 30px;
-    font-weight: bold;
-    color: rgb(150, 67, 67);
-    visibility: hidden;
-    user-select: none;
-}
-.candidate input[type="radio"]:checked ~ .swastika-icon,
-.candidate input[type="checkbox"]:checked ~ .swastika-icon {
-    visibility: visible;
-}
+        .candidate input[type="checkbox"]:checked {
+            background-color: #d4edda;
+            /* light green background */
+            border-color: #28a745;
+            /* green border */
+        }
+
+        .swastika-icon {
+            margin-left: auto;
+            font-size: 30px;
+            font-weight: bold;
+            color: rgb(150, 67, 67);
+            visibility: hidden;
+            user-select: none;
+        }
+
+        .candidate input[type="radio"]:checked~.swastika-icon,
+        .candidate input[type="checkbox"]:checked~.swastika-icon {
+            visibility: visible;
+        }
 
         .submit-btn {
             margin-top: 40px;
             text-align: center;
         }
+
         .btn-submit {
             padding: 12px 36px;
             font-size: 18px;
@@ -111,9 +130,11 @@
             border-radius: 10px;
             transition: background-color 0.3s ease;
         }
+
         .btn-submit:hover {
             background-color: #218838;
         }
+
         .error-message {
             color: red;
             font-weight: bold;
@@ -122,38 +143,42 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>School Election Voting</h1>
         {% if voter %}
-    <div style="background-color:#e9ecef; border-radius:12px; padding:15px 20px; margin-bottom:30px; font-size:18px; color:#212529; text-align:center; font-weight:600;">
-        You are voting as: {{ voter.name }} {{voter.student_class}} {{voter.section}} {{voter.roll_number}}
-    </div>
-{% endif %}
+        <div
+            style="background-color:#e9ecef; border-radius:12px; padding:15px 20px; margin-bottom:30px; font-size:18px; color:#212529; text-align:center; font-weight:600;">
+            You are voting as: {{ voter.name }} {{voter.student_class}} {{voter.section}} Roll no.:
+            {{voter.roll_number}}
+        </div>
+        {% endif %}
 
         {% if message %}
-            <div class="error-message">{{ message }}</div>
+        <div class="error-message">{{ message }}</div>
         {% endif %}
         <form method="post" id="votingForm">
             {% csrf_token %}
             <input type="hidden" name="selected_candidates" id="selectedCandidatesInput" />
             <div class="row">
                 {% for position in positions %}
-                    <div class="col-md-6 position-column">
-                        <h3>{{ position.name }}</h3>
-                        {% for candidate in position.candidate_set.all %}
-                            <label class="candidate">
-                                {% if position.name|lower == "school prefect deputy head" or position.name|lower == "deputy head" %}
-                                    <input type="checkbox" name="position_{{ position.id }}" value="{{ candidate.id }}" />
-                                {% else %}
-                                    <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}" />
-                                {% endif %}
-                                <img src="{{ candidate.image.url }}" alt="{{ candidate.name }}" />
-                                <span>{{ candidate.name }}</span>
-                                <span class="swastika-icon"></span>
-                            </label>
-                        {% endfor %}
-                    </div>
+                <div class="col-md-6 position-column">
+                    <h3>{{ position.name }}</h3>
+                    {% for candidate in position.candidate_set.all %}
+                    <label class="candidate">
+                        {% if position.name|lower == "school prefect deputy head" or position.name|lower == "deputy
+                        head" %}
+                        <input type="checkbox" name="position_{{ position.id }}" value="{{ candidate.id }}" />
+                        {% else %}
+                        <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}" />
+                        {% endif %}
+                        <img src="{{ candidate.image.url }}" alt="{{ candidate.name }}" />
+                        <span>{{ candidate.name }}</span>
+                        <span class="swastika-icon"></span>
+                    </label>
+                    {% endfor %}
+                </div>
                 {% endfor %}
             </div>
             <div class="submit-btn">
@@ -207,25 +232,29 @@
                 const groupName = $(this).attr('name');
                 $('input[name="' + groupName + '"]').each(function () {
                     $(this).siblings('.swastika-icon').text('');
+                    $(this).parent('.candidate').removeClass('selected');
                 });
                 if ($(this).is(':checked')) {
                     $(this).siblings('.swastika-icon').text('卐');
+                    $(this).parent('.candidate').addClass('selected');
                 }
             });
-        
+
             // For checkbox inputs: toggle swastika on changed checkbox only
             $('input[type="checkbox"]').on('change', function () {
                 if ($(this).is(':checked')) {
                     $(this).siblings('.swastika-icon').text('卐');
+                    $(this).parent('.candidate').addClass('selected');
                 } else {
                     $(this).siblings('.swastika-icon').text('');
+                    $(this).parent('.candidate').removeClass('selected');
                 }
             });
-        
+
             // Trigger change on page load to show swastikas for pre-selected inputs
             $('input[type="radio"]:checked, input[type="checkbox"]:checked').trigger('change');
         });
-s        
     </script>
 </body>
+
 </html>
