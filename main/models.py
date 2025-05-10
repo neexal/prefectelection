@@ -18,7 +18,11 @@ class Candidate(models.Model):
 
 class Voter(models.Model):
     voting_id = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
+    student_class = models.CharField(max_length=50)
+    section = models.CharField(max_length=50)
+    roll_number = models.CharField(max_length=50)
     selected_candidates = models.ManyToManyField(Candidate)
 
     def __str__(self):
-        return self.voting_id
+        return f"{self.name} ({self.voting_id})"

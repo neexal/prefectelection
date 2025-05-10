@@ -14,8 +14,9 @@ class CandidateAdmin(admin.ModelAdmin):
 
 @admin.register(Voter)
 class VoterAdmin(admin.ModelAdmin):
-    list_display = ('voting_id', 'display_selected_candidates')
-    search_fields = ('voting_id',)
+    list_display = ('voting_id', 'name', 'student_class', 'section', 'roll_number')
+    # list_display = ('voting_id', 'name', 'student_class', 'section', 'roll_number', 'display_selected_candidates')
+    search_fields = ('voting_id', 'name')
 
     def display_selected_candidates(self, obj):
         return ", ".join([f"{c.name} ({c.position.name})" for c in obj.selected_candidates.all()])

@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Voting Page</title>
-    <link rel="stylesheet" href="{% static 'main/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'main/css/bootstrap.min.css' %}" />
     <style>
         body {
             background-color: #f4f6f8;
@@ -44,7 +44,8 @@
         .candidate:hover {
             background-color: #f1f3f5;
         }
-        .candidate input[type="radio"] {
+        .candidate input[type="radio"],
+        .candidate input[type="checkbox"] {
             display: none;
         }
         .candidate img {
@@ -59,7 +60,8 @@
             font-weight: 500;
             color: #212529;
         }
-        .candidate input[type="radio"]:checked + span::before {
+        .candidate input[type="radio"]:checked + span::before,
+        .candidate input[type="checkbox"]:checked + span::before {
             content: '✓';
             position: absolute;
             right: 20px;
@@ -70,9 +72,31 @@
         .candidate input[type="radio"]:checked ~ * {
             color: #28a745;
         }
-        .candidate input[type="radio"]:checked ~ span {
+        .candidate input[type="checkbox"]:checked ~ * {
+            color: #28a745;
+        }
+        .candidate input[type="radio"]:checked ~ span,
+        .candidate input[type="checkbox"]:checked ~ span {
             font-weight: 600;
         }
+        .candidate input[type="radio"]:checked,
+.candidate input[type="checkbox"]:checked {
+    background-color: #d4edda; /* light green background */
+    border-color: #28a745; /* green border */
+}
+.swastika-icon {
+    margin-left: auto;
+    font-size: 30px;
+    font-weight: bold;
+    color: rgb(150, 67, 67);
+    visibility: hidden;
+    user-select: none;
+}
+.candidate input[type="radio"]:checked ~ .swastika-icon,
+.candidate input[type="checkbox"]:checked ~ .swastika-icon {
+    visibility: visible;
+}
+
         .submit-btn {
             margin-top: 40px;
             text-align: center;
@@ -90,23 +114,43 @@
         .btn-submit:hover {
             background-color: #218838;
         }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>School Election Voting</h1>
+        {% if voter %}
+    <div style="background-color:#e9ecef; border-radius:12px; padding:15px 20px; margin-bottom:30px; font-size:18px; color:#212529; text-align:center; font-weight:600;">
+        You are voting as: {{ voter.name }} {{voter.student_class}} {{voter.section}} {{voter.roll_number}}
+    </div>
+{% endif %}
+
+        {% if message %}
+            <div class="error-message">{{ message }}</div>
+        {% endif %}
         <form method="post" id="votingForm">
             {% csrf_token %}
-            <input type="hidden" name="selected_candidates" id="selectedCandidatesInput">
+            <input type="hidden" name="selected_candidates" id="selectedCandidatesInput" />
             <div class="row">
                 {% for position in positions %}
                     <div class="col-md-6 position-column">
                         <h3>{{ position.name }}</h3>
                         {% for candidate in position.candidate_set.all %}
                             <label class="candidate">
-                                <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}">
-                                <img src="{{ candidate.image.url }}" alt="{{ candidate.name }}">
+                                {% if position.name|lower == "school prefect deputy head" or position.name|lower == "deputy head" %}
+                                    <input type="checkbox" name="position_{{ position.id }}" value="{{ candidate.id }}" />
+                                {% else %}
+                                    <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}" />
+                                {% endif %}
+                                <img src="{{ candidate.image.url }}" alt="{{ candidate.name }}" />
                                 <span>{{ candidate.name }}</span>
+                                <span class="swastika-icon"></span>
                             </label>
                         {% endfor %}
                     </div>
@@ -123,12 +167,65 @@
     <script src="{% static 'main/js/bootstrap.min.js' %}"></script>
     <script>
         $('#votingForm').on('submit', function (e) {
+            e.preventDefault();
             const selected = [];
+            let schoolHeadCount = 0;
+            let deputyHeadCount = 0;
+
+            // Count selections
             $('input[type="radio"]:checked').each(function () {
                 selected.push(parseInt($(this).val()));
+                const positionName = $(this).closest('.position-column').find('h3').text().toLowerCase().trim();
+                if (positionName === 'school prefect head' || positionName === 'school head') {
+                    schoolHeadCount++;
+                }
             });
+
+            $('input[type="checkbox"]:checked').each(function () {
+                selected.push(parseInt($(this).val()));
+                const positionName = $(this).closest('.position-column').find('h3').text().toLowerCase().trim();
+                if (positionName === 'school prefect deputy head' || positionName === 'deputy head') {
+                    deputyHeadCount++;
+                }
+            });
+
+            if (schoolHeadCount !== 1) {
+                alert('Please select exactly 1 School Head.');
+                return;
+            }
+            if (deputyHeadCount !== 2) {
+                alert('Please select exactly 2 Deputy Heads.');
+                return;
+            }
+
             $('#selectedCandidatesInput').val(JSON.stringify(selected));
+            this.submit();
         });
+        $(document).ready(function () {
+            // For radio inputs: clear all swastikas in the group and set on checked input
+            $('input[type="radio"]').on('change', function () {
+                const groupName = $(this).attr('name');
+                $('input[name="' + groupName + '"]').each(function () {
+                    $(this).siblings('.swastika-icon').text('');
+                });
+                if ($(this).is(':checked')) {
+                    $(this).siblings('.swastika-icon').text('卐');
+                }
+            });
+        
+            // For checkbox inputs: toggle swastika on changed checkbox only
+            $('input[type="checkbox"]').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $(this).siblings('.swastika-icon').text('卐');
+                } else {
+                    $(this).siblings('.swastika-icon').text('');
+                }
+            });
+        
+            // Trigger change on page load to show swastikas for pre-selected inputs
+            $('input[type="radio"]:checked, input[type="checkbox"]:checked').trigger('change');
+        });
+s        
     </script>
 </body>
 </html>

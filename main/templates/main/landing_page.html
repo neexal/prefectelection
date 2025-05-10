@@ -52,6 +52,13 @@
             width:300px;
             height:300px;
         }
+        .voter-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
@@ -69,9 +76,17 @@
                 </div>
             </div>
         </form>
-        {% if message%}
-            <div><p class="text-danger h4"><b>{{message}}</b></p></div>
-        {%endif%}
+        {% if message %}
+            <div><p class="text-danger h4"><b>{{ message }}</b></p></div>
+        {% endif %}
+        {% comment %} {% if voter %}
+            <div class="voter-info">
+                <p><strong>Name:</strong> {{ voter.name }}</p>
+                <p><strong>Class:</strong> {{ voter.student_class }}</p>
+                <p><strong>Section:</strong> {{ voter.section }}</p>
+                <p><strong>Roll Number:</strong> {{ voter.roll_number }}</p>
+            </div>
+        {% endif %} {% endcomment %}
         <div id="customKeyboard" class="custom-keyboard">
             <button onclick="appendToInput(1)">1</button>
             <button onclick="appendToInput(2)">2</button>
